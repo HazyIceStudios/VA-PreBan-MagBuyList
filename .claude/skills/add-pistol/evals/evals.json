@@ -1,0 +1,23 @@
+{
+  "skill_name": "add-pistol",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "add Beretta CX4 Storm",
+      "expected_output": "New entry inserted into DATA array in output/mag-buy-list.html with correct fields; buyPistols and buyMags arrays populated; cross-compatibility with Beretta 92-series mags noted; committed to master and gh-pages.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "add Ruger PC Carbine 9mm",
+      "expected_output": "New entry inserted with Glock-compatible mag cross-compat noted; preBan correctly set based on Glock mag capacities; committed and deployed.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "add Springfield SA-35",
+      "expected_output": "New entry for the SA-35 (9mm Hi-Power clone) with correct 15rd standard / 17rd extended mag options; Hi-Power ecosystem compatibility noted; committed and deployed.",
+      "files": []
+    }
+  ]
+}
