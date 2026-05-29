@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High-Cap Mag Buy List — Virginia Pre-Ban 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    min-height: 100vh;
+  }
+
+  /* ── Banner ───────────────────────────────────── */
+  .banner {
+    background: #1e293b;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .banner-left h1 { font-size: 1.3rem; font-weight: 700; color: #f8fafc; letter-spacing: .01em; }
+  .banner-left p  { font-size: .83rem; color: #94a3b8; margin-top: 3px; }
+  .deadline-pill  {
+    background: #dc2626; color: #fff; border-radius: 6px;
+    padding: 4px 12px; font-size: .72rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; display: inline-block; margin-top: 6px;
+  }
+  .countdown-box  {
+    background: #0f172a; border: 1px solid #334155; border-radius: 10px;
+    padding: 12px 22px; text-align: center; white-space: nowrap;
+  }
+  .countdown-box .days  { font-size: 2.2rem; font-weight: 800; color: #fbbf24; line-height: 1; }
+  .countdown-box .label { font-size: .68rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; margin-top: 3px; }
+
+  /* ── Stats ────────────────────────────────────── */
+  .stats-bar {
+    display: flex; gap: 14px; padding: 16px 32px;
+    background: #fff; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 13px 22px; flex: 1; min-width: 130px; text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .stat-card .value { font-size: 1.9rem; font-weight: 800; line-height: 1; }
+  .stat-card .lbl   { font-size: .7rem; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+  .stat-card.all    .value { color: #2563eb; }
+  .stat-card.urgent .value { color: #dc2626; }
+  .stat-card.safe   .value { color: #16a34a; }
+
+  /* ── Filters ──────────────────────────────────── */
+  .filters {
+    display: flex; gap: 14px; padding: 14px 32px;
+    background: #fff; border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap; align-items: flex-end;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; }
+  .filter-group label { font-size: .68rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  input[type="text"], select {
+    background: #f8fafc; border: 1px solid #e2e8f0; color: #1e293b;
+    border-radius: 7px; padding: 7px 12px; font-size: .875rem; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type="text"] { width: 230px; }
+  input[type="text"]:focus, select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+  .filter-toggle { display: flex; border-radius: 7px; overflow: hidden; border: 1px solid #e2e8f0; background: #f8fafc; }
+  .filter-toggle button {
+    background: transparent; border: none; color: #64748b;
+    padding: 7px 13px; font-size: .79rem; cursor: pointer;
+    transition: background .12s, color .12s; font-weight: 500;
+  }
+  .filter-toggle button.active { background: #2563eb; color: #fff; }
+  .filter-toggle button:not(:last-child) { border-right: 1px solid #e2e8f0; }
+
+  .clear-btn {
+    background: #fff; border: 1px solid #e2e8f0; color: #64748b; border-radius: 7px;
+    padding: 7px 16px; font-size: .8rem; cursor: pointer; font-weight: 500; align-self: flex-end;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .clear-btn:hover { border-color: #94a3b8; color: #1e293b; background: #f8fafc; }
+
+  /* ── Table wrapper ────────────────────────────── */
+  .table-wrapper { padding: 20px 32px 48px; overflow-x: auto; }
+  #result-count  { font-size: .75rem; color: #94a3b8; margin-bottom: 10px; font-weight: 500; }
+
+  /* ── Table ────────────────────────────────────── */
+  table {
+    width: 100%; border-collapse: separate; border-spacing: 0; font-size: .845rem;
+    background: #fff; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.08), 0 0 0 1px #e2e8f0;
+  }
+  thead th {
+    background: #f8fafc; color: #475569; font-weight: 600; font-size: .69rem;
+    text-transform: uppercase; letter-spacing: .07em; padding: 11px 13px;
+    text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+    cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 10;
+    transition: color .12s, background .12s;
+  }
+  thead th:hover { color: #1e293b; background: #f1f5f9; }
+  thead th .si { margin-left: 3px; opacity: .4; font-size: .6rem; }
+  thead th.sa .si::after { content: " ▲"; opacity: 1; color: #2563eb; }
+  thead th.sd .si::after { content: " ▼"; opacity: 1; color: #2563eb; }
+  thead th:not(.sa):not(.sd) .si::after { content: " ⬍"; }
+
+  tbody tr { transition: background .1s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody tr.pb-yes { background: #fffbeb; }
+  tbody tr.pb-yes:hover { background: #fef9c3; }
+
+  td {
+    padding: 11px 13px; vertical-align: top; line-height: 1.5;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* ── Cell pieces ──────────────────────────────── */
+  .rank-badge {
+    display: inline-block; border-radius: 6px; padding: 2px 8px;
+    font-size: .74rem; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+  }
+  .rank-badge.rec { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
+
+  .model-name { font-weight: 650; color: #0f172a; font-size: .88rem; }
+  .cal-badge {
+    display: inline-block; background: #fef9c3; color: #92400e; border: 1px solid #fde68a;
+    border-radius: 4px; padding: 1px 6px; font-size: .65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; margin-left: 5px; vertical-align: middle;
+  }
+  .src-tag {
+    display: inline-block; background: #ede9fe; color: #6d28d9; border-radius: 4px;
+    padding: 1px 6px; font-size: .63rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; margin-left: 5px; vertical-align: middle;
+  }
+  .purpose-tag {
+    display: inline-block; background: #e0f2fe; color: #0369a1; border-radius: 4px;
+    padding: 2px 8px; font-size: .7rem; font-weight: 500; white-space: nowrap;
+  }
+  .price { white-space: nowrap; color: #166534; font-weight: 700; font-size: .84rem; }
+
+  .mag-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .mag-pill {
+    background: #dbeafe; color: #1e40af; border-radius: 4px;
+    padding: 2px 8px; font-size: .71rem; font-weight: 600; white-space: nowrap;
+  }
+
+  .badge-yes {
+    display: inline-block; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;
+    border-radius: 5px; padding: 3px 9px; font-size: .71rem; font-weight: 700; white-space: nowrap;
+  }
+  .badge-no {
+    display: inline-block; background: #dcfce7; color: #15803d; border: 1px solid #86efac;
+    border-radius: 5px; padding: 3px 9px; font-size: .71rem; font-weight: 700; white-space: nowrap;
+  }
+
+  .rec-text  { color: #78350f; font-size: .83rem; }
+  .mag-price { color: #0369a1; font-size: .76rem; margin-top: 3px; }
+  .brands    { color: #5b21b6; font-size: .79rem; }
+  .compat    { color: #475569; font-size: .77rem; max-width: 220px; }
+  .note-text { color: #c2410c; font-size: .73rem; margin-top: 4px; }
+
+  .link-btn {
+    display: inline-block; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
+    border-radius: 5px; padding: 2px 9px; font-size: .71rem; font-weight: 600;
+    text-decoration: none; white-space: nowrap; margin-top: 5px;
+    transition: background .12s, color .12s;
+  }
+  .link-btn:hover { background: #2563eb; color: #fff; }
+  .link-btn.gun  { background: #ecfdf5; color: #166534; border-color: #86efac; }
+  .link-btn.gun:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+
+  .no-results {
+    text-align: center; padding: 56px 24px; color: #94a3b8; font-size: 1rem;
+    background: #fff; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+
+  @media print {
+    body { background: #fff; }
+    .banner { background: #1e293b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .filters { display: none; }
+    table { box-shadow: none; }
+    tbody tr.pb-yes { background: #fffbeb; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="banner-left">
+    <h1>High-Cap Magazine Buy List</h1>
+    <p>Virginia pre-ban purchasing guide — stock up before the deadline</p>
+    <span class="deadline-pill">Ban Date: July 1, 2026</span>
+  </div>
+  <div class="countdown-box">
+    <div class="days" id="days-left">—</div>
+    <div class="label">Days Remaining</div>
+  </div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+
+<div class="filters">
+  <div class="filter-group">
+    <label>Search</label>
+    <input type="text" id="search" placeholder="Model, brand, PCC, compatibility…" oninput="applyFilters()">
+  </div>
+  <div class="filter-group">
+    <label>Pre-Ban Action</label>
+    <div class="filter-toggle" id="pb-toggle">
+      <button class="active" data-v="all" onclick="tog('pb','all',this)">All</button>
+      <button data-v="yes" onclick="tog('pb','yes',this)">Needed</button>
+      <button data-v="no"  onclick="tog('pb','no',this)">Not Needed</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>Caliber</label>
+    <div class="filter-toggle" id="cal-toggle">
+      <button class="active" data-v="all"   onclick="tog('cal','all',this)">All</button>
+      <button data-v="9mm"   onclick="tog('cal','9mm',this)">9mm</button>
+      <button data-v="10mm"  onclick="tog('cal','10mm',this)">10mm</button>
+      <button data-v=".22"   onclick="tog('cal','.22',this)">.22</button>
+      <button data-v=".380"  onclick="tog('cal','.380',this)">.380</button>
+      <button data-v=".45"   onclick="tog('cal','.45',this)">.45 ACP</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>Purpose</label>
+    <select id="pur-filter" onchange="applyFilters()">
+      <option value="">All Purposes</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Max Gun Price</label>
+    <select id="price-filter" onchange="applyFilters()">
+      <option value="">Any Price</option>
+      <option value="350">Up to $350</option>
+      <option value="500">Up to $500</option>
+      <option value="700">Up to $700</option>
+      <option value="1000">Up to $1,000</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Source</label>
+    <div class="filter-toggle" id="src-toggle">
+      <button class="active" data-v="all"  onclick="tog('src','all',this)">All</button>
+      <button data-v="list" onclick="tog('src','list',this)">Spreadsheet</button>
+      <button data-v="rec"  onclick="tog('src','rec',this)">My Picks</button>
+    </div>
+  </div>
+  <button class="clear-btn" onclick="clearAll()">Clear</button>
+</div>
+
+<div class="table-wrapper">
+  <div id="result-count"></div>
+  <table id="tbl">
+    <thead><tr>
+      <th onclick="sb('rank')">Rank<span class="si"></span></th>
+      <th onclick="sb('model')">Pistol Model<span class="si"></span></th>
+      <th onclick="sb('purpose')">Purpose<span class="si"></span></th>
+      <th onclick="sb('priceMin')">Gun Price<span class="si"></span></th>
+      <th onclick="sb('magOptions')">High-Cap Mag Options<span class="si"></span></th>
+      <th onclick="sb('preBan')">Pre-Ban<span class="si"></span></th>
+      <th>Recommendation &amp; Est. Mag Price</th>
+      <th>Mag Brands</th>
+      <th>Compatible Pistols &amp; PCCs</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="no-results" id="none" style="display:none">No pistols match the current filters.</div>
+</div>
+
+<script>
+const DATA = [/*__DATA__*/];
+
+// ── Link helpers ──────────────────────────────────
+function gbUrl(q) {
+  return "https://www.gunbroker.com/All/search?Keywords=" + encodeURIComponent(q);
+}
+function gmwUrl(q) {
+  const query = q.includes("magazine") ? q + " buy" : q + " magazine buy";
+  return "https://www.google.com/search?q=" + encodeURIComponent(query);
+}
+
+// ── State ─────────────────────────────────────────
+let sCol = "rank", sDir = 1;
+const F = { pb:"all", cal:"all", src:"all" };
+
+// ── Countdown ─────────────────────────────────────
+(()=>{
+  const d = Math.ceil((new Date("2026-07-01") - new Date()) / 86400000);
+  document.getElementById("days-left").textContent = d > 0 ? d : "PASSED";
+})();
+
+// ── Populate Purpose dropdown ─────────────────────
+const purs = [...new Set(DATA.map(p => p.purpose.split(" / ")[0]))].sort();
+const psel = document.getElementById("pur-filter");
+purs.forEach(p => { const o = document.createElement("option"); o.value = p; o.textContent = p; psel.appendChild(o); });
+
+// ── Stats ─────────────────────────────────────────
+function stats(rows) {
+  const u = rows.filter(r=>r.preBan).length, s = rows.length - u;
+  document.getElementById("stats-bar").innerHTML =
+    `<div class="stat-card all"><div class="value">${rows.length}</div><div class="lbl">Pistols Shown</div></div>
+     <div class="stat-card urgent"><div class="value">${u}</div><div class="lbl">Pre-Ban Action Needed</div></div>
+     <div class="stat-card safe"><div class="value">${s}</div><div class="lbl">Covered / Under Limit</div></div>`;
+}
+
+// ── Sort ──────────────────────────────────────────
+function sb(col) {
+  sDir = sCol === col ? sDir * -1 : 1; sCol = col;
+  document.querySelectorAll("thead th").forEach(t=>t.classList.remove("sa","sd"));
+  const idx = ["rank","model","purpose","priceMin","magOptions","preBan"].indexOf(col);
+  if (idx >= 0) document.querySelectorAll("thead th")[idx].classList.add(sDir===1?"sa":"sd");
+  applyFilters();
+}
+
+// ── Toggle ────────────────────────────────────────
+function tog(key, val, btn) {
+  F[key] = val;
+  btn.closest(".filter-toggle").querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  applyFilters();
+}
+
+// ── Clear ─────────────────────────────────────────
+function clearAll() {
+  document.getElementById("search").value = "";
+  document.getElementById("pur-filter").value = "";
+  document.getElementById("price-filter").value = "";
+  ["pb","cal","src"].forEach(k => {
+    const id = k+"-toggle";
+    document.querySelector(`#${id} button[data-v="all"]`).click();
+  });
+}
+
+// ── Render ────────────────────────────────────────
+function applyFilters() {
+  const q   = document.getElementById("search").value.toLowerCase();
+  const pur = document.getElementById("pur-filter").value;
+  const mp  = parseInt(document.getElementById("price-filter").value) || Infinity;
+
+  let rows = DATA.filter(p => {
+    if (F.pb  === "yes" && !p.preBan) return false;
+    if (F.pb  === "no"  &&  p.preBan) return false;
+    if (F.src !== "all" && p.src !== F.src) return false;
+    if (F.cal === "9mm"  && p.cal !== "9mm")  return false;
+    if (F.cal === ".22"  && p.cal !== ".22")   return false;
+    if (F.cal === "10mm" && p.cal !== "10mm")  return false;
+    if (F.cal === ".380" && p.cal !== ".380")  return false;
+    if (F.cal === ".45"  && p.cal !== ".45")   return false;
+    if (pur && !p.purpose.includes(pur)) return false;
+    if (p.priceMin > mp) return false;
+    if (q) {
+      const hay = [p.model,p.purpose,p.brands,p.compat,p.rec,p.mags.join(" "),p.note||""].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  rows.sort((a,b)=>{
+    let av=a[sCol], bv=b[sCol];
+    if (sCol==="magOptions"||sCol==="mags") { av=a.mags[0]; bv=b.mags[0]; }
+    if (sCol==="preBan") { av=a.preBan?1:0; bv=b.preBan?1:0; }
+    if (typeof av==="string") return sDir*av.localeCompare(bv);
+    return sDir*(av-bv);
+  });
+
+  stats(rows);
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  if (!rows.length) {
+    document.getElementById("none").style.display = "";
+    document.getElementById("tbl").style.display  = "none";
+    document.getElementById("result-count").textContent = "No results";
+    return;
+  }
+  document.getElementById("none").style.display = "none";
+  document.getElementById("tbl").style.display  = "";
+
+  rows.forEach(p => {
+    const tr  = document.createElement("tr");
+    if (p.preBan) tr.classList.add("pb-yes");
+
+    const isRec   = p.src === "rec";
+    const rankCls = isRec ? "rank-badge rec" : "rank-badge";
+    const srcTag  = isRec ? `<span class="src-tag">★ Pick</span>` : "";
+    const calBadge= `<span class="cal-badge">${p.cal}</span>`;
+    const pills   = p.mags.map(m=>`<span class="mag-pill">${m}</span>`).join("");
+    const badge   = p.preBan
+      ? `<span class="badge-yes">⚡ Buy Now</span>`
+      : `<span class="badge-no">✓ Not Needed</span>`;
+    const noteHtml  = p.note ? `<div class="note-text">${p.note}</div>` : "";
+    const magLinks  = p.buyMags.map(q => {
+      const cap = q.match(/\d+rd/)?.[0] || "Mags";
+      return `<a class="link-btn" href="${gmwUrl(q)}" target="_blank" rel="noopener">${cap} ↗</a>`;
+    }).join(" ");
+    const linkHtml  = `<br><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${magLinks}</div>`;
+    const primaryPur= p.purpose.split(" / ")[0];
+
+    tr.innerHTML = `
+      <td><span class="${rankCls}">#${p.rd}</span></td>
+      <td>
+        <span class="model-name">${p.model}</span>${calBadge}${srcTag}
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+          ${p.buyPistols.map(n=>`<a class="link-btn gun" href="${gbUrl(n)}" target="_blank" rel="noopener">${n} ↗</a>`).join("")}
+        </div>
+      </td>
+      <td><span class="purpose-tag">${primaryPur}</span></td>
+      <td class="price">$${p.priceMin.toLocaleString()}–$${p.priceMax.toLocaleString()}</td>
+      <td><div class="mag-pills">${pills}</div></td>
+      <td>${badge}</td>
+      <td><span class="rec-text">${p.rec}</span><div class="mag-price">💰 ${p.magPrice}</div>${linkHtml}</td>
+      <td class="brands">${p.brands}</td>
+      <td><div class="compat">${p.compat}${noteHtml}</div></td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("result-count").textContent =
+    `Showing ${rows.length} of ${DATA.length} pistols`;
+}
+
+sb("rank");
+</script>
+</body>
+</html>

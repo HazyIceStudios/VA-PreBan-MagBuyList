@@ -1,10 +1,10 @@
 ---
 name: generate-report
-description: Commits the current mag-buy-list HTML report and deploys it to GitHub Pages. Use this whenever the user says "publish", "deploy", "push to pages", "update the site", "generate the report", "sync", or has just finished making edits and wants them live. Also triggers when the user asks to "regenerate", "rebuild", or "refresh" the report without specifying a data change.
+description: Regenerates the mag-buy-list HTML report from the SQLite database, then commits and deploys to GitHub Pages. Use this whenever the user says "publish", "deploy", "push to pages", "update the site", "generate the report", "sync", "regenerate", "rebuild", or "refresh". Also use when the database has been edited and the HTML needs to be brought up to date.
 disable-model-invocation: true
 ---
 
-Commit the current state of `output/mag-buy-list.html` and deploy it to GitHub Pages.
+Regenerate `output/mag-buy-list.html` from the database and deploy to GitHub Pages.
 
 ## Project path
 
@@ -12,30 +12,36 @@ Commit the current state of `output/mag-buy-list.html` and deploy it to GitHub P
 
 ---
 
-## Step 1 — Check for uncommitted changes
+## Step 1 — Regenerate the HTML from the database
 
 ```bash
 cd "C:\Users\micwe\OneDrive\ClaudeRepo\Guns\HighCapacityMagBuyList"
-git status
+python scripts/generate_report.py
 ```
 
-If `output/mag-buy-list.html` has no changes (already committed and clean), skip to Step 3 — the file is already on master and only Pages needs syncing.
+This reads `data/pistols.db` and writes a fresh `output/mag-buy-list.html`.
 
 ---
 
-## Step 2 — Commit to master
+## Step 2 — Check for changes and commit to master
 
 ```bash
-git add output/mag-buy-list.html
-git commit -m "Update mag buy list report"
+git status
+```
+
+If `output/mag-buy-list.html` (or `data/pistols.db`) has changes, commit them:
+
+```bash
+git add output/mag-buy-list.html data/pistols.db
+git commit -m "Regenerate report from database"
 git push origin master
 ```
+
+If already clean and up to date, skip to Step 3.
 
 ---
 
 ## Step 3 — Deploy to GitHub Pages
-
-The `gh-pages` branch contains only `index.html`. Copy the current report there and push.
 
 ```powershell
 Copy-Item "output\mag-buy-list.html" "$env:TEMP\pages-update.html"
@@ -46,6 +52,8 @@ git commit -m "Deploy to Pages"
 git push origin gh-pages
 git checkout master
 ```
+
+If `index.html` has no changes (already in sync), the commit will be skipped automatically.
 
 ---
 

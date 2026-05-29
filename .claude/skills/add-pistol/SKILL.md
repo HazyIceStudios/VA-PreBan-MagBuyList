@@ -1,6 +1,6 @@
 ---
 name: add-pistol
-description: Adds a new pistol entry to the VA Pre-Ban Mag Buy List HTML report, then commits and deploys to GitHub Pages. Use this whenever the user wants to add a gun, pistol, or firearm to the list — phrases like "add [gun] to the list", "include [model] in the report", "add [pistol]", or just a gun name typed alone. Always use this skill rather than manually editing the HTML.
+description: Adds a new pistol entry to the VA Pre-Ban Mag Buy List — inserts into the SQLite database, regenerates the HTML report, then commits and deploys to GitHub Pages. Use this whenever the user wants to add a gun, pistol, or firearm to the list — phrases like "add [gun] to the list", "include [model] in the report", "add [pistol]", or just a gun name typed alone. Always use this skill rather than manually editing the HTML or database.
 disable-model-invocation: true
 ---
 
@@ -31,62 +31,69 @@ Use your training knowledge to determine all of the following. Be specific and a
 | **Est. mag price** | Per-mag cost range for the recommended mags (e.g., "~$35–45/mag OEM (17rd)") |
 | **Mag brands** | OEM first, then popular aftermarket (e.g., "Glock (OEM), Magpul PMAG, ETS") |
 | **Compatible guns / PCCs** | Other pistols and carbines sharing the same magazine — be thorough |
-| **Notes** | Critical warnings or standout facts (frame damage risk, proprietary-only mags, compatibility caveats). Empty string if nothing notable. |
+| **Notes** | Critical warnings or standout facts. Empty string if nothing notable. |
 
 ---
 
 ## Step 2 — Determine rank
 
-Read `output/mag-buy-list.html` and find the highest `rank:` value in the DATA array. Assign the new entry `rank + 1`. New entries are always `src: "rec"`.
+Query the database for the current highest rank:
+
+```bash
+python -c "import sqlite3; c=sqlite3.connect('data/pistols.db'); print(c.execute('SELECT MAX(rank) FROM pistols').fetchone()[0])"
+```
+
+New entry rank = that value + 1. New entries are always `src="rec"`.
 
 ---
 
-## Step 3 — Build all entry fields
+## Step 3 — Field reference
 
-Every field below is required. Do not omit any.
+Every field below is required:
 
 ```
-rank       — next integer after current highest
-rd         — string of rank (e.g., "35")
+rank       — next integer (from Step 2)
+rd         — string of rank (e.g., "36")
 src        — "rec"
-model      — full name with variants; add caliber in parens only if not obvious
-             e.g., "HK USP Compact", "Ruger PC Carbine (9mm)"
-cal        — caliber: "9mm" | "10mm" | ".22" | ".380" | ".45" | other
-buyPistols — array of individual variant search strings for GunBroker
-             each entry is a distinct purchasable model
-             e.g., ["HK USP 9mm", "HK USP Compact 9mm", "HK USP 45"]
-buyMags    — array of mag search strings for Google Shopping
-             one entry per distinct capacity option
-             format: "[Brand] [Model] [caliber] [N]rd"
-             e.g., ["HK USP 9mm 15rd", "HK USP 9mm 18rd extended"]
+model      — full name; add caliber in parens if not obvious
+cal        — "9mm" | "10mm" | ".22" | ".380" | ".45" | other
 purpose    — "Primary / Secondary" slash-separated string
-priceMin   — integer MSRP low
-priceMax   — integer MSRP high
-mags       — human-readable array matching the mag options you researched
-             e.g., ["15rd (OEM standard)", "18rd (extended)"]
-preBan     — boolean
-rec        — recommendation string (what to buy, why, any critical notes)
-magPrice   — cost estimate string
+price_min  — integer MSRP low
+price_max  — integer MSRP high
+pre_ban    — True or False
+rec        — recommendation string
+mag_price  — cost estimate string (e.g., "~$35–45/mag OEM (17rd)")
 brands     — OEM + aftermarket brands as a single string
-compat     — compatible pistols and PCCs as a single string; note any cross-compat
-             restrictions explicitly
+compat     — compatible pistols and PCCs as a single string
 note       — warning/quirk string, or "" if none
-linkMag    — "" (links are generated dynamically from buyMags — leave empty)
+link_mag   — "" (leave empty — links generated from buy_mags)
+buy_pistols— list of individual variant search strings for GunBroker
+buy_mags   — list of mag search strings for Google (one per capacity)
+             format: "[Brand] [Model] [caliber] [N]rd"
+mags       — human-readable list of mag options
+             e.g., ["17rd (OEM)", "20rd (extended)"]
 ```
 
 ---
 
-## Step 4 — Insert into the HTML
+## Step 4 — Insert into the database
 
-Open `output/mag-buy-list.html`. Find the end of the DATA array — it's the line that reads `];` after the last entry's closing `}`. Insert the new entry **before** that line, separated by a comma from the previous entry. Match the formatting style of existing entries exactly (two-space indent, one field per line).
+Append a new dict to the `PISTOLS` list in `scripts/init_db.py`, then rebuild:
+
+```bash
+cd "C:\Users\micwe\OneDrive\ClaudeRepo\Guns\HighCapacityMagBuyList"
+python scripts/init_db.py
+python scripts/generate_report.py
+```
+
+This recreates the database from the full PISTOLS list and regenerates `output/mag-buy-list.html`.
 
 ---
 
 ## Step 5 — Commit and push to master
 
 ```bash
-cd "C:\Users\micwe\OneDrive\ClaudeRepo\Guns\HighCapacityMagBuyList"
-git add output/mag-buy-list.html
+git add data/pistols.db scripts/init_db.py output/mag-buy-list.html
 git commit -m "Add [MODEL] to mag buy list"
 git push origin master
 ```
@@ -95,13 +102,10 @@ git push origin master
 
 ## Step 6 — Deploy to GitHub Pages
 
-The `gh-pages` branch contains only `index.html` (a copy of the report). Update it:
-
 ```powershell
-# Windows — copy updated HTML before switching branches
 Copy-Item "output\mag-buy-list.html" "$env:TEMP\pages-update.html"
 git checkout gh-pages
-Copy-Item "$env:TEMP\pages-update.html" "index.html"
+Copy-Item "$env:TEMP\pages-update.html" "index.html" -Force
 git add index.html
 git commit -m "Deploy to Pages — add [MODEL]"
 git push origin gh-pages
@@ -113,6 +117,6 @@ git checkout master
 ## Step 7 — Confirm
 
 Tell the user:
-- The pistol that was added and its rank
+- The pistol added and its rank
 - Whether pre-ban action is needed (and what to buy if so)
-- The live Pages URL: https://hazyicestudios.github.io/VA-PreBan-MagBuyList/
+- Live URL: https://hazyicestudios.github.io/VA-PreBan-MagBuyList/
