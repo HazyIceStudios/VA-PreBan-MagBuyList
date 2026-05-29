@@ -56,11 +56,11 @@ def generate():
     if not DB.exists():
         raise FileNotFoundError(f"Database not found: {DB}\nRun: python scripts/init_db.py")
 
-    data = load_data()
-    js   = json.dumps(data, indent=2, ensure_ascii=False)
+    data     = load_data()
+    js_inner = json.dumps(data, indent=2, ensure_ascii=False)[1:-1]  # strip outer [ ]
 
     template = TEMPLATE.read_text(encoding="utf-8")
-    output   = template.replace("/*__DATA__*/", js, 1)
+    output   = template.replace("/*__DATA__*/", js_inner, 1)
 
     OUTPUT.parent.mkdir(exist_ok=True)
     OUTPUT.write_text(output, encoding="utf-8")
