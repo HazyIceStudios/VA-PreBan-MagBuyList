@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High-Cap Mag Buy List — Virginia Pre-Ban 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    min-height: 100vh;
+  }
+
+  /* ── Banner ───────────────────────────────────── */
+  .banner {
+    background: #1e293b;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .banner-left h1 { font-size: 1.3rem; font-weight: 700; color: #f8fafc; letter-spacing: .01em; }
+  .banner-left p  { font-size: .83rem; color: #94a3b8; margin-top: 3px; }
+  .deadline-pill  {
+    background: #dc2626; color: #fff; border-radius: 6px;
+    padding: 4px 12px; font-size: .72rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; display: inline-block; margin-top: 6px;
+  }
+  .countdown-box  {
+    background: #0f172a; border: 1px solid #334155; border-radius: 10px;
+    padding: 12px 22px; text-align: center; white-space: nowrap;
+  }
+  .countdown-box .days  { font-size: 2.2rem; font-weight: 800; color: #fbbf24; line-height: 1; }
+  .countdown-box .label { font-size: .68rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; margin-top: 3px; }
+
+  /* ── Stats ────────────────────────────────────── */
+  .stats-bar {
+    display: flex; gap: 14px; padding: 16px 32px;
+    background: #fff; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 13px 22px; flex: 1; min-width: 130px; text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .stat-card .value { font-size: 1.9rem; font-weight: 800; line-height: 1; }
+  .stat-card .lbl   { font-size: .7rem; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+  .stat-card.all    .value { color: #2563eb; }
+  .stat-card.urgent .value { color: #dc2626; }
+  .stat-card.safe   .value { color: #16a34a; }
+
+  /* ── Filters ──────────────────────────────────── */
+  .filters {
+    display: flex; gap: 14px; padding: 14px 32px;
+    background: #fff; border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap; align-items: flex-end;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; }
+  .filter-group label { font-size: .68rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  input[type="text"], select {
+    background: #f8fafc; border: 1px solid #e2e8f0; color: #1e293b;
+    border-radius: 7px; padding: 7px 12px; font-size: .875rem; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type="text"] { width: 230px; }
+  input[type="text"]:focus, select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+  .filter-toggle { display: flex; border-radius: 7px; overflow: hidden; border: 1px solid #e2e8f0; background: #f8fafc; }
+  .filter-toggle button {
+    background: transparent; border: none; color: #64748b;
+    padding: 7px 13px; font-size: .79rem; cursor: pointer;
+    transition: background .12s, color .12s; font-weight: 500;
+  }
+  .filter-toggle button.active { background: #2563eb; color: #fff; }
+  .filter-toggle button:not(:last-child) { border-right: 1px solid #e2e8f0; }
+
+  .clear-btn {
+    background: #fff; border: 1px solid #e2e8f0; color: #64748b; border-radius: 7px;
+    padding: 7px 16px; font-size: .8rem; cursor: pointer; font-weight: 500; align-self: flex-end;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .clear-btn:hover { border-color: #94a3b8; color: #1e293b; background: #f8fafc; }
+
+  /* ── Table wrapper ────────────────────────────── */
+  .table-wrapper { padding: 20px 32px 48px; overflow-x: auto; }
+  #result-count  { font-size: .75rem; color: #94a3b8; margin-bottom: 10px; font-weight: 500; }
+
+  /* ── Table ────────────────────────────────────── */
+  table {
+    width: 100%; border-collapse: separate; border-spacing: 0; font-size: .845rem;
+    background: #fff; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.08), 0 0 0 1px #e2e8f0;
+  }
+  thead th {
+    background: #f8fafc; color: #475569; font-weight: 600; font-size: .69rem;
+    text-transform: uppercase; letter-spacing: .07em; padding: 11px 13px;
+    text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+    cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 10;
+    transition: color .12s, background .12s;
+  }
+  thead th:hover { color: #1e293b; background: #f1f5f9; }
+  thead th .si { margin-left: 3px; opacity: .4; font-size: .6rem; }
+  thead th.sa .si::after { content: " ▲"; opacity: 1; color: #2563eb; }
+  thead th.sd .si::after { content: " ▼"; opacity: 1; color: #2563eb; }
+  thead th:not(.sa):not(.sd) .si::after { content: " ⬍"; }
+
+  tbody tr { transition: background .1s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody tr.pb-yes { background: #fffbeb; }
+  tbody tr.pb-yes:hover { background: #fef9c3; }
+
+  td {
+    padding: 11px 13px; vertical-align: top; line-height: 1.5;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* ── Cell pieces ──────────────────────────────── */
+  .rank-badge {
+    display: inline-block; border-radius: 6px; padding: 2px 8px;
+    font-size: .74rem; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+  }
+  .rank-badge.rec { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
+
+  .model-name { font-weight: 650; color: #0f172a; font-size: .88rem; }
+  .cal-badge {
+    display: inline-block; background: #fef9c3; color: #92400e; border: 1px solid #fde68a;
+    border-radius: 4px; padding: 1px 6px; font-size: .65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; margin-left: 5px; vertical-align: middle;
+  }
+  .src-tag {
+    display: inline-block; background: #ede9fe; color: #6d28d9; border-radius: 4px;
+    padding: 1px 6px; font-size: .63rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; margin-left: 5px; vertical-align: middle;
+  }
+  .purpose-tag {
+    display: inline-block; background: #e0f2fe; color: #0369a1; border-radius: 4px;
+    padding: 2px 8px; font-size: .7rem; font-weight: 500; white-space: nowrap;
+  }
+  .price { white-space: nowrap; color: #166534; font-weight: 700; font-size: .84rem; }
+
+  .mag-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .mag-pill {
+    background: #dbeafe; color: #1e40af; border-radius: 4px;
+    padding: 2px 8px; font-size: .71rem; font-weight: 600; white-space: nowrap;
+  }
+
+  .badge-yes {
+    display: inline-block; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;
+    border-radius: 5px; padding: 3px 9px; font-size: .71rem; font-weight: 700; white-space: nowrap;
+  }
+  .badge-no {
+    display: inline-block; background: #dcfce7; color: #15803d; border: 1px solid #86efac;
+    border-radius: 5px; padding: 3px 9px; font-size: .71rem; font-weight: 700; white-space: nowrap;
+  }
+
+  .rec-text  { color: #78350f; font-size: .83rem; }
+  .mag-price { color: #0369a1; font-size: .76rem; margin-top: 3px; }
+  .brands    { color: #5b21b6; font-size: .79rem; }
+  .compat    { color: #475569; font-size: .77rem; max-width: 220px; }
+  .note-text { color: #c2410c; font-size: .73rem; margin-top: 4px; }
+
+  .link-btn {
+    display: inline-block; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
+    border-radius: 5px; padding: 2px 9px; font-size: .71rem; font-weight: 600;
+    text-decoration: none; white-space: nowrap; margin-top: 5px;
+    transition: background .12s, color .12s;
+  }
+  .link-btn:hover { background: #2563eb; color: #fff; }
+  .link-btn.gun  { background: #ecfdf5; color: #166534; border-color: #86efac; }
+  .link-btn.gun:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+
+  .no-results {
+    text-align: center; padding: 56px 24px; color: #94a3b8; font-size: 1rem;
+    background: #fff; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+
+  @media print {
+    body { background: #fff; }
+    .banner { background: #1e293b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .filters { display: none; }
+    table { box-shadow: none; }
+    tbody tr.pb-yes { background: #fffbeb; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="banner-left">
+    <h1>High-Cap Magazine Buy List</h1>
+    <p>Virginia pre-ban purchasing guide — stock up before the deadline</p>
+    <span class="deadline-pill">Ban Date: July 1, 2026</span>
+  </div>
+  <div class="countdown-box">
+    <div class="days" id="days-left">—</div>
+    <div class="label">Days Remaining</div>
+  </div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+
+<div class="filters">
+  <div class="filter-group">
+    <label>Search</label>
+    <input type="text" id="search" placeholder="Model, brand, PCC, compatibility…" oninput="applyFilters()">
+  </div>
+  <div class="filter-group">
+    <label>Pre-Ban Action</label>
+    <div class="filter-toggle" id="pb-toggle">
+      <button class="active" data-v="all" onclick="tog('pb','all',this)">All</button>
+      <button data-v="yes" onclick="tog('pb','yes',this)">Needed</button>
+      <button data-v="no"  onclick="tog('pb','no',this)">Not Needed</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>Caliber</label>
+    <div class="filter-toggle" id="cal-toggle">
+      <button class="active" data-v="all"   onclick="tog('cal','all',this)">All</button>
+      <button data-v="9mm"   onclick="tog('cal','9mm',this)">9mm</button>
+      <button data-v="10mm"  onclick="tog('cal','10mm',this)">10mm</button>
+      <button data-v=".22"   onclick="tog('cal','.22',this)">.22</button>
+      <button data-v=".380"  onclick="tog('cal','.380',this)">.380</button>
+      <button data-v=".45"   onclick="tog('cal','.45',this)">.45 ACP</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>Purpose</label>
+    <select id="pur-filter" onchange="applyFilters()">
+      <option value="">All Purposes</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Max Gun Price</label>
+    <select id="price-filter" onchange="applyFilters()">
+      <option value="">Any Price</option>
+      <option value="350">Up to $350</option>
+      <option value="500">Up to $500</option>
+      <option value="700">Up to $700</option>
+      <option value="1000">Up to $1,000</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Source</label>
+    <div class="filter-toggle" id="src-toggle">
+      <button class="active" data-v="all"  onclick="tog('src','all',this)">All</button>
+      <button data-v="list" onclick="tog('src','list',this)">Spreadsheet</button>
+      <button data-v="rec"  onclick="tog('src','rec',this)">My Picks</button>
+    </div>
+  </div>
+  <button class="clear-btn" onclick="clearAll()">Clear</button>
+</div>
+
+<div class="table-wrapper">
+  <div id="result-count"></div>
+  <table id="tbl">
+    <thead><tr>
+      <th onclick="sb('rank')">Rank<span class="si"></span></th>
+      <th onclick="sb('model')">Pistol Model<span class="si"></span></th>
+      <th onclick="sb('purpose')">Purpose<span class="si"></span></th>
+      <th onclick="sb('priceMin')">Gun Price<span class="si"></span></th>
+      <th onclick="sb('magOptions')">High-Cap Mag Options<span class="si"></span></th>
+      <th onclick="sb('preBan')">Pre-Ban<span class="si"></span></th>
+      <th>Recommendation &amp; Est. Mag Price</th>
+      <th>Mag Brands</th>
+      <th>Compatible Pistols &amp; PCCs</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="no-results" id="none" style="display:none">No pistols match the current filters.</div>
+</div>
+
+<script>
+const DATA = [
+
+// ════════════════════════════════════════════════════════════
+//  SPREADSHEET DATA
+// ════════════════════════════════════════════════════════════
+
+{
+  rank:4, rd:"4", src:"list",
+  model:"Sig Sauer P365 / P365X / P365-Xmacro", cal:"9mm",
+  purpose:"Concealed / EDC",
+  priceMin:449, priceMax:679,
+  mags:["12rd (P365/P365X)","15rd (P365XL)","17rd (Xmacro only)"],
+  preBan:true,
+  rec:"Buy 17-rd Xmacro mags now. Standard P365/P365X max out at 12rd — Xmacro frame required for 17rd.",
+  magPrice:"~$50–65/mag OEM (17rd Xmacro)",
+  brands:"Sig Sauer (OEM only — proprietary)",
+  compat:"P365, P365X, P365XL, P365-Xmacro. Note: 17rd mag requires Xmacro or compatible grip module — won't fit standard P365 frame.",
+  note:"Modular basepads allow capacity extension. Only the Xmacro grip module accepts the 17rd magazine.",
+  linkMag:""
+},
+{
+  rank:1, rd:"1", src:"list",
+  model:"Glock 19", cal:"9mm",
+  purpose:"Do-All / Concealed / Home Defense",
+  priceMin:499, priceMax:549,
+  mags:["15rd (factory)","17rd (G17 OEM)","19rd (extended)","24rd (OEM)","33rd (OEM drum)"],
+  preBan:false,
+  rec:"Covered by your existing Glock 17 stockpile. G17 factory mags are cross-compatible with G19.",
+  magPrice:"$25–45/mag OEM; $20–30 Magpul PMAG",
+  brands:"Glock (OEM), Magpul PMAG GL9, ETS, KCI",
+  compat:"G17, G19, G19X, G26 (flush with sleeve), G34, G45, G47; Kel-Tec Sub2000 Gen3, Ruger PC Carbine 9mm, CMMG Banshee 9mm, Just Right Carbines, FM-9 PCC",
+  note:"Most widely compatible 9mm magazine in existence. 33rd OEM drum is fully reliable.",
+  linkMag:""
+},
+{
+  rank:12, rd:"12", src:"list",
+  model:"Glock 43X / 48 (Slimline)", cal:"9mm",
+  purpose:"Concealed (EDC Slimline)",
+  priceMin:449, priceMax:519,
+  mags:["10rd (OEM flush)","15rd (Shield Arms S15 steel)"],
+  preBan:false,
+  rec:"Shield Arms S15 provides 15rd in the same physical footprint as the factory 10rd — right at the ban limit. No pre-ban buying needed.",
+  magPrice:"$15–22/mag OEM; $35–45 Shield Arms S15",
+  brands:"Glock (OEM), Shield Arms (S15 steel aftermarket)",
+  compat:"G43X and G48 only — single-stack slim frame. No cross-compatibility with full-size Glock 9mm mags.",
+  note:"Shield Arms S15 requires replacing the factory plastic mag release with a Shield Arms steel mag release (included in kit). S15 is at the 15rd limit — not affected by ban.",
+  linkMag:""
+},
+{
+  rank:3, rd:"3", src:"list",
+  model:"Sig Sauer P320 Series", cal:"9mm",
+  purpose:"Home Defense / Duty / Modular",
+  priceMin:499, priceMax:749,
+  mags:["15rd (Compact)","17rd (Full)","21rd (XFULL / XFIVE)","30rd (extended)"],
+  preBan:true,
+  rec:"Buy 21-rd factory mags. They drop into any P320 full/carry/X-series frame. The 30rd is available for specific X-series setups.",
+  magPrice:"$40–55/mag OEM (21rd); $30–45 Mec-Gar (17rd)",
+  brands:"Sig Sauer (OEM), Mec-Gar, Act-Mag",
+  compat:"P320 Full, Compact, Carry, XFULL, XFIVE Legion, M17, M18, custom aftermarket grip modules; partially compatible with MCX Rattler (verify model)",
+  note:"Modular polymer frame — swapping grip modules changes which mag size fits. 21rd is the sweet spot for capacity vs. flush carry.",
+  linkMag:""
+},
+{
+  rank:8, rd:"8", src:"list",
+  model:"Springfield Hellcat / Hellcat Pro", cal:"9mm",
+  purpose:"Concealed (EDC)",
+  priceMin:499, priceMax:599,
+  mags:["11rd (Hellcat standard flush)","13rd (Hellcat flush-extended)","17rd (Hellcat Pro only)"],
+  preBan:true,
+  rec:"Buy 17-rd Hellcat Pro mags. Only the Hellcat Pro frame physically accepts the 17rd mag.",
+  magPrice:"$35–50/mag OEM (17rd)",
+  brands:"Springfield Armory (OEM — proprietary design)",
+  compat:"All Hellcat variants (standard mags), Hellcat Pro frame required for 17rd. No cross-compat with other platforms.",
+  note:"Proprietary magazine design. 17rd extends slightly past the grip on Pro models. Flush-fit on original Hellcat is 11rd only.",
+  linkMag:"https://gunmagwarehouse.com/springfield-armory-hellcat-pro-9mm-17-round-magazine.html"
+},
+{
+  rank:5, rd:"5", src:"list",
+  model:"S&W M&P9 M2.0 Full-Size", cal:"9mm",
+  purpose:"Home Defense / Duty / Open Carry",
+  priceMin:499, priceMax:599,
+  mags:["17rd (Full-Size standard)","23rd (PC extended)"],
+  preBan:true,
+  rec:"Buy 17-rd OEM or Mec-Gar mags, and a few 23-rd PC extended for HD use. ~$30–45/mag.",
+  magPrice:"$30–40/mag OEM (17rd); $40–55 OEM (23rd)",
+  brands:"Smith & Wesson (OEM), Mec-Gar (17rd flush compatible)",
+  compat:"M&P9 Full, M&P9 M2.0 Compact (with mag sleeve), M&P9 CORE; S&W FPC folding carbine, S&W Response PCC. NOTE: M&P Shield Plus uses a DIFFERENT proprietary 1.5-stack mag — NOT compatible.",
+  note:"Most reliable 17rd mag for M&P9 is Mec-Gar — slightly better fit than OEM for some users.",
+  linkMag:""
+},
+{
+  rank:18, rd:"18", src:"list",
+  model:"Taurus TX22 (.22 LR)", cal:".22",
+  purpose:"Plinking / Training / Rimfire",
+  priceMin:289, priceMax:449,
+  mags:["16rd (.22 LR)","22rd (.22 LR)"],
+  preBan:true,
+  rec:"Buy 22-rd mags for Competition/T.O.R.O. and 16-rd for standard TX22. Cheap rimfire mags worth stocking in bulk.",
+  magPrice:"$25–35/mag OEM (16rd); $30–40 OEM (22rd)",
+  brands:"Taurus (OEM only — proprietary .22 LR)",
+  compat:"TX22 Standard, TX22 Gen 2, TX22 T.O.R.O., TX22 Competition SCR. No cross-compatibility with other platforms.",
+  note:"Best budget rimfire pistol for practice. Stocking 22rd mags for sub-$35 each is low cost for high-volume training.",
+  linkMag:""
+},
+{
+  rank:10, rd:"10", src:"list",
+  model:"S&W M&P Shield Plus", cal:"9mm",
+  purpose:"Concealed (EDC)",
+  priceMin:449, priceMax:499,
+  mags:["10rd (flush)","13rd (extended)"],
+  preBan:false,
+  rec:"Maxes out at 13rd — not affected by the ban. No pre-ban action needed.",
+  magPrice:"$30–40/mag OEM",
+  brands:"Smith & Wesson (OEM — proprietary 1.5-stack design)",
+  compat:"M&P Shield Plus 9mm only. NOT compatible with full-size M&P9 magazines despite similar appearance.",
+  note:"Proprietary 1.5-column stack mag — unique to this pistol. Do not confuse with full-size M&P9 mags.",
+  linkMag:""
+},
+{
+  rank:24, rd:"24", src:"list",
+  model:"Ruger Mark IV (.22 LR)", cal:".22",
+  purpose:"Target / Rimfire Competition",
+  priceMin:449, priceMax:699,
+  mags:["10rd (OEM standard)"],
+  preBan:false,
+  rec:"Factory maxes at 10rd — not affected by the ban. ProMag makes a 25rd aftermarket but it's unreliable.",
+  magPrice:"$20–30/mag OEM (10rd)",
+  brands:"Ruger (OEM), ProMag (25rd — low reliability, not recommended)",
+  compat:"Mark IV standard, Mark IV Target, Mark IV 22/45, Mark IV 22/45 Lite. All Mark IV share the same single-stack .22 LR mag.",
+  note:"Iconic .22 LR target pistol. Factory 10rd mag is reliable; aftermarket 25rd ProMag is generally avoided by serious shooters.",
+  linkMag:""
+},
+{
+  rank:2, rd:"2", src:"list",
+  model:"Glock 17 / Glock 47", cal:"9mm",
+  purpose:"Home Defense / Duty / Range",
+  priceMin:499, priceMax:649,
+  mags:["17rd (factory)","19rd (extended)","24rd (OEM)","33rd (OEM drum)"],
+  preBan:false,
+  rec:"Already covered by your Glock 17 Gen6 stockpile. Same mags as your current pistol.",
+  magPrice:"$25–45/mag OEM; $20–30 Magpul PMAG GL9",
+  brands:"Glock (OEM), Magpul PMAG GL9, ETS, KCI, Lancer",
+  compat:"G17, G19, G19X, G26, G34, G45, G47, Polymer80 frames; Kel-Tec Sub2000 Gen3, Ruger PC Carbine 9mm, CMMG Banshee, Just Right Carbines, Angstadt Arms UDP-9",
+  note:"The most cross-compatible 9mm magazine platform. Your Glock 17 stockpile works across all these.",
+  linkMag:""
+},
+{
+  rank:17, rd:"17", src:"list",
+  model:"CZ P-10 Series", cal:"9mm",
+  purpose:"Home Defense / Concealed",
+  priceMin:349, priceMax:459,
+  mags:["15rd (P-10C standard)","17rd (P-10F / P-10C extended)","19rd (P-10F factory max)"],
+  preBan:true,
+  rec:"Buy 19-rd P-10F mags. They work in P-10C with the included grip sleeve. ~$35–50/mag OEM.",
+  magPrice:"$35–45/mag OEM (17rd); $40–50 OEM (19rd)",
+  brands:"CZ-USA (OEM), Mec-Gar (limited)",
+  compat:"P-10F (19rd native), P-10C (P-10F mags with sleeve), P-10S (P-10C mags with sleeve); CZ P-07 and P-09 are hammer-fired variants sharing similar but not identical mag body.",
+  note:"P-10F mags fit P-10C only with the factory grip sleeve — not a direct drop-in without it. P-07/P-09 share similar pattern but verify before depending on it.",
+  linkMag:""
+},
+{
+  rank:9, rd:"9", src:"list",
+  model:"Walther PDP Full-Size", cal:"9mm",
+  purpose:"Home Defense / Duty / Competition",
+  priceMin:549, priceMax:699,
+  mags:["15rd (PDP Compact)","18rd (PDP Full-Size 4\")","20rd (PDP Full-Size extended)"],
+  preBan:true,
+  rec:"Buy 18-rd or 20-rd Full-Size mags. ~$45–60/mag OEM. Full-Size mags fit Compact with sleeve.",
+  magPrice:"$45–55/mag OEM (18rd); $50–65 OEM (20rd)",
+  brands:"Walther (OEM), Mec-Gar (PDP-compatible variants)",
+  compat:"PDP Full-Size 4\", PDP Full-Size 5\", PDP Compact (with full-size sleeve), PDP-F Sub-Compact; PDP Match Slim (different mag).",
+  note:"⚠️ CRITICAL: Walther PDP has NO internal mechanical mag stop. Over-seating the magazine damages the polymer frame. Seat firmly but do not slam. Known issue — verify before purchase.",
+  linkMag:""
+},
+{
+  rank:22, rd:"22", src:"list",
+  model:"Springfield Echelon", cal:"9mm",
+  purpose:"Home Defense / Duty / Tactical",
+  priceMin:589, priceMax:649,
+  mags:["17rd (standard)","20rd (extended)"],
+  preBan:true,
+  rec:"Buy 20-rd OEM mags. Proprietary — no aftermarket options. ~$45–55/mag.",
+  magPrice:"$45–55/mag OEM (20rd)",
+  brands:"Springfield Armory (OEM only — proprietary design)",
+  compat:"Echelon Standard, Echelon Comp. No cross-compatibility with any other platform.",
+  note:"Fully proprietary magazine — buy OEM only. Modular optics plate accepts most major red dots. Grip fits medium-large hands well.",
+  linkMag:""
+},
+{
+  rank:15, rd:"15", src:"list",
+  model:"Ruger LCP Max (.380 ACP)", cal:".380",
+  purpose:"Pocket Carry / Deep Concealment",
+  priceMin:369, priceMax:429,
+  mags:["10rd (flush)","12rd (extended)"],
+  preBan:false,
+  rec:".380 ACP — maxes out at 12rd. No pre-ban action needed.",
+  magPrice:"$25–35/mag OEM",
+  brands:"Ruger (OEM — proprietary)",
+  compat:"LCP Max only. Not compatible with original LCP, LCP II, or LCP Custom.",
+  note:"Deep concealment .380. No high-cap options exist or are planned. Maxes at 12rd factory.",
+  linkMag:""
+},
+{
+  rank:11, rd:"11", src:"list",
+  model:"Canik METE / SFx Rival", cal:"9mm",
+  purpose:"Competition / Home Defense",
+  priceMin:399, priceMax:649,
+  mags:["18rd (METE SFT standard)","20rd (extended)"],
+  preBan:true,
+  rec:"Buy 20-rd OEM extended mags. Best value performance pistol — ~$35–45/mag OEM.",
+  magPrice:"$35–45/mag OEM (20rd)",
+  brands:"Canik (OEM), Mec-Gar (select models)",
+  compat:"METE SFT, METE SFX, SFx Rival, SFx Rival-S, TP9SFx, TP9SF Elite, TP9DA/DP, Canik FANATIK. NOTE: Canik MC9 micro uses DIFFERENT, shorter mags — not compatible with full-size METE line.",
+  note:"MC9 mags ≠ METE mags. If buying both Canik pistols, buy mags separately. Exceptional value competition trigger.",
+  linkMag:""
+},
+{
+  rank:21, rd:"21", src:"list",
+  model:"Taurus G3 / G3C", cal:"9mm",
+  purpose:"Budget Carry / Home Defense",
+  priceMin:249, priceMax:319,
+  mags:["10rd (G3C flush)","15rd (G3C extended / G3 standard)","17rd (G3 full-size extended)"],
+  preBan:true,
+  rec:"Buy 17-rd full-size G3 mags. Very affordable at ~$25–35/mag. Best budget 9mm stockpile option.",
+  magPrice:"$25–35/mag OEM (17rd); $30–40 Mec-Gar",
+  brands:"Taurus (OEM), Mec-Gar, SGM Tactical",
+  compat:"G3, G3C, G3X, G3XL; partial compatibility reported with older Taurus PT92/PT100 variants — verify before relying on it.",
+  note:"Best price-per-round-capacity value on the list. At $250 for the gun and $30/mag for 17rd mags, this is the cheapest pre-ban setup available.",
+  linkMag:""
+},
+{
+  rank:14, rd:"14", src:"list",
+  model:"Springfield Prodigy / Staccato 2011", cal:"9mm",
+  purpose:"Competition / Premium Duty",
+  priceMin:1299, priceMax:2799,
+  mags:["17rd (standard 2011)","20rd (extended)","26rd (extended+)","31rd (MBX max)"],
+  preBan:true,
+  rec:"Buy 20-rd and 26-rd mags. MBX 31-rd is the highest-capacity factory-fit mag. ~$50–80/mag.",
+  magPrice:"$50–65/mag OEM (20rd); $65–80 MBX/Check-Mate (26–31rd)",
+  brands:"Staccato (OEM), Springfield (OEM), Check-Mate Industries, MBX, Dawson Precision, Henning",
+  compat:"All 2011 double-stack pattern: Staccato C/C2/P/XC, Springfield Prodigy, Apollo 11, Oracle Arms, SPS Platense, Atlas Gunworks, DVC, Limcat, Infinity, STI (legacy).",
+  note:"Standard 2011 double-stack magazine pattern — widely shared across all premium 2011-platform pistols. MBX 31-rd is the legal max before ban.",
+  linkMag:""
+},
+{
+  rank:27, rd:"27", src:"list",
+  model:"S&W Bodyguard 2.0 (.380 ACP)", cal:".380",
+  purpose:"Pocket Carry / Backup Gun",
+  priceMin:389, priceMax:449,
+  mags:["10rd (flush)","12rd (extended)"],
+  preBan:false,
+  rec:".380 ACP — maxes at 12rd. Not affected by ban.",
+  magPrice:"$25–35/mag OEM",
+  brands:"Smith & Wesson (OEM — proprietary)",
+  compat:"Bodyguard 2.0 only. Not compatible with original Bodyguard 380.",
+  note:"Redesigned from the ground up vs. original Bodyguard. Improved trigger and ergonomics. Still limited to 12rd max.",
+  linkMag:""
+},
+{
+  rank:16, rd:"16", src:"list",
+  model:"FN 509 Series", cal:"9mm",
+  purpose:"Tactical / Home Defense / Duty",
+  priceMin:549, priceMax:999,
+  mags:["17rd (standard — all models)","24rd (FN 509 Tactical extended)"],
+  preBan:true,
+  rec:"Buy 17-rd and 24-rd FN OEM mags. The 24-rd is flush-profiled for concealed carry on the Tactical. ~$40–60/mag.",
+  magPrice:"$40–50/mag OEM (17rd); $50–65 OEM (24rd)",
+  brands:"FN America (OEM only — proprietary design)",
+  compat:"FN 509 LS Edge, FN 509 Full-Size, FN 509 Midsize, FN 509 Compact MRD, FN 509 Tactical. NOTE: FN 509 .22 LR conversion uses completely different mags.",
+  note:"Fully proprietary FN magazine — limited aftermarket. The 24-rd extended is reportedly flush-profile on the Tactical model. Buy OEM only.",
+  linkMag:""
+},
+
+// ════════════════════════════════════════════════════════════
+//  WILDERNESS / BEAR DEFENSE — 10mm
+// ════════════════════════════════════════════════════════════
+
+{
+  rank:30, rd:"30", src:"rec",
+  model:"Glock 20 / Glock 40 MOS (10mm Auto)", cal:"10mm",
+  purpose:"Wilderness / Home Defense / Hunting",
+  priceMin:549, priceMax:699,
+  mags:["15rd (factory standard)","17rd (KCI / aftermarket extended)"],
+  preBan:true,
+  rec:"Buy 17-rd KCI extended mags before ban. The G20 is the #1 recommended semi-auto for bear defense. CRITICAL: Use hard cast flat-nose loads (Buffalo Bore, Underwood, DoubleTap) — hollow points won't penetrate enough on large bears.",
+  magPrice:"$30–40/mag Glock OEM (15rd); $20–30 KCI (17rd extended)",
+  brands:"Glock (OEM), KCI, ETS",
+  compat:"G20 and G40 MOS share identical 15rd magazines. G29 (sub-compact) uses same mags with factory grip sleeve. NOT cross-compatible with 9mm Glock mags.",
+  note:"⚠️ BEAR DEFENSE: Hard cast flat-nose bullets only. Buffalo Bore 220gr HC, Underwood 200gr HC, or DoubleTap 200gr HC recommended. G40 MOS adds a 6\" barrel for higher velocity and optic mounting. Best semi-auto option for bear country.",
+  linkMag:""
+},
+{
+  rank:31, rd:"31", src:"rec",
+  model:"Glock 29 SF (10mm Auto — Compact)", cal:"10mm",
+  purpose:"Wilderness Carry / Compact Defense",
+  priceMin:499, priceMax:599,
+  mags:["10rd (factory flush)","15rd (G20 OEM — fits with factory grip sleeve)"],
+  preBan:false,
+  rec:"Most concealable 10mm available. Use G20 15rd mags with factory sleeve for full capacity. 15rd is at the ban limit — no pre-ban action needed for standard setup.",
+  magPrice:"$30–40/mag Glock G20 OEM (15rd, with sleeve)",
+  brands:"Glock (OEM — G20 mags compatible with sleeve)",
+  compat:"G29 native 10rd. G20/G40 full-size 15rd mags fit with factory grip sleeve included with pistol.",
+  note:"Best choice when weight and concealability matter in the field. Same ballistics as G20 from the shorter barrel. The SF (Short Frame) variant fits smaller hands.",
+  linkMag:""
+},
+{
+  rank:32, rd:"32", src:"rec",
+  model:"EAA Witness / Tanfoglio Hunter (10mm Auto)", cal:"10mm",
+  purpose:"Wilderness / Hunting / Competition",
+  priceMin:499, priceMax:749,
+  mags:["15rd (double-stack factory)"],
+  preBan:false,
+  rec:"CZ 75-pattern double-stack 10mm with 15rd factory capacity — at the limit, no pre-ban action needed. Hunter model has 6\" barrel for maximum velocity. Very accurate at range.",
+  magPrice:"$35–55/mag OEM",
+  brands:"EAA / Tanfoglio (OEM — proprietary 10mm double-stack)",
+  compat:"EAA Witness Full-Size, Witness Hunter, Witness Elite, Witness Match; Tanfoglio Stock, Combat, Limited, Gold Custom (all 10mm variants share mag pattern).",
+  note:"Italian-made on a CZ 75 chassis. The Hunter 10mm with a 6\" barrel is a purpose-built woods gun. Very reliable with hot 10mm loads. Limited US aftermarket support.",
+  linkMag:""
+},
+{
+  rank:33, rd:"33", src:"rec",
+  model:"1911 Platform — 10mm (Bruin / Camp Guard / Delta Elite)", cal:"10mm",
+  purpose:"Wilderness / Heritage",
+  priceMin:899, priceMax:2499,
+  mags:["8rd (standard single-stack)","9rd (some extended models)"],
+  preBan:false,
+  rec:"Single-stack 10mm in a 1911 chassis. 8-9rd is well under the ban limit — no pre-ban needed. The Dan Wesson Bruin is the purpose-built woods carry choice.",
+  magPrice:"$30–55/mag (1911 10mm OEM varies by brand); $30–40 Metalform/Wilson Combat",
+  brands:"Dan Wesson (OEM), Kimber (OEM), Colt (OEM), Wilson Combat, Metalform, Chip McCormick (10mm rated)",
+  compat:"Dan Wesson Bruin, Razorback, RZ-10 Commander; Kimber Camp Guard 10, Rapide 10mm; Colt Delta Elite; Rock Island 10mm; Ruger SR1911 10mm. All share GI-spec single-stack 10mm mag pattern.",
+  note:"Dan Wesson Bruin is stainless steel with a 4\" Commander barrel — specifically designed for wilderness carry. Colt Delta Elite is the classic that started the 10mm 1911 category. All use same mag pattern.",
+  linkMag:""
+},
+{
+  rank:34, rd:"34", src:"rec",
+  model:"Sig Sauer P220 Legion (10mm Auto)", cal:"10mm",
+  purpose:"Wilderness / Premium Duty",
+  priceMin:1099, priceMax:1299,
+  mags:["8rd (single-stack DA/SA)"],
+  preBan:false,
+  rec:"Premium DA/SA 10mm — 8rd is under the ban limit, no pre-ban needed. The finest factory DA/SA trigger available in 10mm. Excellent for shooters who prefer a hammer-fired action.",
+  magPrice:"$45–60/mag Sig OEM (8rd)",
+  brands:"Sig Sauer (OEM — proprietary P220 10mm single-stack)",
+  compat:"P220 Legion 10mm only. P220 10mm mags are NOT cross-compatible with P220 .45 ACP mags despite same frame.",
+  note:"Sig's P220 in 10mm uses an alloy frame with a rail. Superb accuracy and the best double-action trigger pull available from the factory in 10mm. Limited capacity but exceptional quality.",
+  linkMag:""
+},
+
+// ════════════════════════════════════════════════════════════
+//  MY RECOMMENDATIONS
+// ════════════════════════════════════════════════════════════
+
+{
+  rank:7, rd:"7", src:"rec",
+  model:"HK VP9 / VP9SK", cal:"9mm",
+  purpose:"Home Defense / Duty / Competition",
+  priceMin:649, priceMax:749,
+  mags:["17rd (standard paddle-release)","20rd (extended)"],
+  preBan:true,
+  rec:"Buy 17-rd and 20-rd HK OEM mags. Outstanding factory trigger. VP9 and P30 share identical mags — stock one supply for both. ~$35–55/mag.",
+  magPrice:"$35–45/mag OEM (17rd); $50–60 OEM (20rd)",
+  brands:"HK (OEM), Mec-Gar (VP9/P30 compatible)",
+  compat:"VP9, VP9SK (full-size + sleeve), HK P30, HK P30L, HK P30SK (full-size + sleeve). P30 and VP9 use identical magazines — fully interchangeable.",
+  note:"Paddle mag release is polarizing — most shooters adapt quickly and prefer it. 20-rd extended available and very reliable.",
+  linkMag:""
+},
+{
+  rank:19, rd:"19", src:"rec",
+  model:"Beretta 92X / M9A4", cal:"9mm",
+  purpose:"Home Defense / Competition / Legacy",
+  priceMin:749, priceMax:1149,
+  mags:["15rd (OEM standard 92FS)","17rd (factory 92X full)","18rd (Mec-Gar flush-fit)","20rd (Mec-Gar extended)"],
+  preBan:true,
+  rec:"Buy Mec-Gar 18-rd flush mags — same physical size as the OEM 15-rd, 3 extra rounds free. Mec-Gar 18rd is the best mag upgrade in 9mm. ~$25–35/mag Mec-Gar.",
+  magPrice:"$35–45/mag OEM (17rd); $25–35 Mec-Gar (18rd flush); $30–40 Mec-Gar (20rd extended)",
+  brands:"Beretta (OEM), Mec-Gar, Wilson Combat, Chip McCormick, Langdon Tactical",
+  compat:"92FS, 92X, 92X Performance, 92X RDO, M9, M9A1, M9A4, 92A1; Beretta CX4 Storm carbine (same 9mm mags!); Beretta ARX100 (some compatibility).",
+  note:"Mec-Gar 18-rd flush is arguably the best-value magazine upgrade in all of 9mm. CX4 Storm carbine uses exact same mags — exceptional PCC/pistol sharing ecosystem.",
+  linkMag:""
+},
+{
+  rank:13, rd:"13", src:"rec",
+  model:"CZ Shadow 2 / CZ 75 SP-01", cal:"9mm",
+  purpose:"Competition / DA-SA Target",
+  priceMin:699, priceMax:1349,
+  mags:["17rd (CZ OEM)","19rd (Mec-Gar flush-fit — same size as 17rd)"],
+  preBan:true,
+  rec:"Buy Mec-Gar 19-rd flush mags — they are the same physical size as the OEM 17-rd. Best DA/SA competition trigger available. ~$25–35/mag Mec-Gar.",
+  magPrice:"$35–45/mag CZ OEM (17rd); $25–35 Mec-Gar (19rd flush)",
+  brands:"CZ-USA (OEM), Mec-Gar, Arredondo, ETS, Henning",
+  compat:"CZ Shadow 2, Shadow 2 OR, Shadow 2 Compact, CZ 75 SP-01 Shadow, CZ 75 B, CZ 75 D PCR, CZ 75 BD, CZ P-07, CZ P-09; Arex Rex Zero 1 / Delta Gen 2 (CZ 75 magazine pattern).",
+  note:"The entire CZ 75 platform (~50+ pistol models across 50+ years) shares the same double-stack 9mm magazine. Largest single-platform mag ecosystem in the world. Mec-Gar 19rd is flush to 17rd OEM.",
+  linkMag:""
+},
+{
+  rank:20, rd:"20", src:"rec",
+  model:"Springfield XD-M Elite", cal:"9mm",
+  purpose:"Home Defense / Competition",
+  priceMin:549, priceMax:699,
+  mags:["19rd (3.8\" / 4.5\" models)","22rd (5.25\" Precision / OSP)"],
+  preBan:true,
+  rec:"Buy 22-rd mags for the 5.25\" OSP / Precision — highest single-stack factory capacity in the price range. ~$40–50/mag OEM.",
+  magPrice:"$40–50/mag OEM (19rd); $45–55 OEM (22rd)",
+  brands:"Springfield Armory (OEM), SGM Tactical",
+  compat:"XD-M Elite 3.8\", XD-M Elite 4.5\", XD-M Elite 5.25\" Precision; XD-M Compact (with sleeve).",
+  note:"⚠️ NOT backward-compatible with original XD or original XD-M mags. Elite is a completely redesigned proprietary magazine. Do not mix with older XD-M stock.",
+  linkMag:""
+},
+{
+  rank:23, rd:"23", src:"rec",
+  model:"IWI Masada / Masada ACE", cal:"9mm",
+  purpose:"Home Defense / Duty",
+  priceMin:449, priceMax:549,
+  mags:["17rd (standard)","21rd (extended)"],
+  preBan:true,
+  rec:"Buy 17-rd and 21-rd IWI OEM mags. Israeli mil-spec build at civilian price. Aftermarket is growing but limited — buy OEM now. ~$35–55/mag.",
+  magPrice:"$35–45/mag OEM (17rd); $45–55 OEM (21rd)",
+  brands:"IWI (OEM — proprietary, limited aftermarket)",
+  compat:"Masada Standard, Masada ACE (optics-ready). Masada Slim uses a different shorter magazine.",
+  note:"Designed and built by Israel Weapon Industries — same company behind the Tavor. Polymer frame with steel chassis insert. Proprietary mag — buy OEM while available.",
+  linkMag:""
+},
+{
+  rank:25, rd:"25", src:"rec",
+  model:"Beretta APX A2 Full-Size", cal:"9mm",
+  purpose:"Home Defense / Duty",
+  priceMin:399, priceMax:499,
+  mags:["15rd (Compact)","17rd (Full-Size standard)"],
+  preBan:true,
+  rec:"Buy 17-rd APX A2 Full-Size OEM mags. Best ergonomics in the budget duty-pistol segment. ~$40–50/mag.",
+  magPrice:"$40–50/mag OEM (17rd)",
+  brands:"Beretta (OEM — APX-specific proprietary design)",
+  compat:"APX A2 Full-Size, APX A2 Carry (different smaller mag). NOT compatible with Beretta 92-series mags despite sharing the brand.",
+  note:"APX A2 mags are proprietary — completely different from the 92FS. Major improvement over original APX. Aggressive texturing and excellent trigger reset.",
+  linkMag:""
+},
+{
+  rank:28, rd:"28", src:"rec",
+  model:"Arex Rex Zero 1 / Delta Gen 2", cal:"9mm",
+  purpose:"Home Defense / Competition",
+  priceMin:499, priceMax:649,
+  mags:["17rd (CZ 75 pattern — OEM)","19rd (Mec-Gar CZ 75 flush-fit)"],
+  preBan:true,
+  rec:"Buy Mec-Gar 19-rd CZ 75-pattern mags — same mags as CZ Shadow 2 / CZ 75. Full CZ 75 ecosystem compatibility. ~$25–35/mag Mec-Gar.",
+  magPrice:"$30–40/mag Arex OEM; $25–35 Mec-Gar CZ 75 pattern (19rd)",
+  brands:"Arex (OEM), Mec-Gar (CZ 75 pattern), CZ-USA (OEM)",
+  compat:"Rex Zero 1S, Zero 1TC, Zero 1CP, Zero 1 Standard, Delta Gen 2; ENTIRE CZ 75 magazine ecosystem — CZ Shadow 2, CZ 75 B, CZ 75 SP-01, CZ P-07, CZ P-09, etc.",
+  note:"Slovenian CZ 75 clone with military contract pedigree. Uses standard CZ 75 double-stack mag — buy Mec-Gar CZ 75 19rd mags and they work in both Rex and any CZ 75 platform.",
+  linkMag:""
+},
+{
+  rank:26, rd:"26", src:"rec",
+  model:"S&W SD9 / SD9VE", cal:"9mm",
+  purpose:"Budget Home Defense",
+  priceMin:299, priceMax:379,
+  mags:["16rd (Full-Size standard)"],
+  preBan:true,
+  rec:"Buy 16-rd OEM mags — it's 1 round over the limit and will be banned for sale. One of the cheapest pre-ban guns on the market. ~$30–40/mag OEM.",
+  magPrice:"$30–40/mag OEM (16rd)",
+  brands:"Smith & Wesson (OEM — proprietary SD-series design)",
+  compat:"SD9, SD9VE, SD9VE 2.0. NOT compatible with M&P9 or Shield Plus mags despite same brand.",
+  note:"Ultra-budget option. 16rd is exactly 1 round over the limit — worth stocking for the price. Long trigger pull by design but reliable and very affordable.",
+  linkMag:""
+},
+{
+  rank:29, rd:"29", src:"rec",
+  model:"Kel-Tec PMR-30 (.22 WMR)", cal:".22",
+  purpose:"Plinking / Unique / Rimfire",
+  priceMin:399, priceMax:469,
+  mags:["30rd (.22 WMR — standard factory capacity)"],
+  preBan:true,
+  rec:"Buy extra 30-rd .22 WMR mags now — the 30-rd is STANDARD capacity and will be banned for sale. Same mag works in the Kel-Tec CMR-30 carbine. ~$35–45/mag OEM.",
+  magPrice:"$35–45/mag OEM (30rd .22 WMR)",
+  brands:"Kel-Tec (OEM only — proprietary .22 WMR)",
+  compat:"PMR-30 pistol; Kel-Tec CMR-30 carbine (same 30rd .22 WMR magazine — perfect PCC pair).",
+  note:"Only pistol on this list where 30 rounds is the standard factory capacity. .22 WMR (not .22 LR) — higher velocity rimfire. Pairs perfectly with CMR-30 carbine using same mags. Unique stockpile value.",
+  linkMag:""
+}
+
+,
+{
+  rank:6, rd:"6", src:"rec",
+  model:"1911 Government / Commander (.45 ACP)", cal:".45",
+  purpose:"Home Defense / Heritage / Competition",
+  priceMin:499, priceMax:1499,
+  mags:["7rd (GI standard)","8rd (modern standard)","10rd (flush extended)"],
+  preBan:false,
+  rec:"Standard 1911 maxes at 10rd — not affected by the ban. No pre-ban action needed. Focus on buying quality mags (Wilson Combat, Chip McCormick) for reliability.",
+  magPrice:"$15–25/mag GI surplus; $20–35 Wilson Combat / Chip McCormick (8rd); $25–40 extended (10rd)",
+  brands:"Colt (OEM), Wilson Combat, Chip McCormick, Metalform, Tripp Research, Kimber, Ed Brown, Nighthawk",
+  compat:"All standard GI-spec single-stack 1911 mags are cross-compatible across: Colt Government/Commander/Officer, Springfield Mil-Spec/Range Officer/Loaded, Kimber Custom/Pro/Ultra, Rock Island Armory GI/Tactical/M1911-A1, Ruger SR1911, Dan Wesson, Remington R1, Sig 1911, Auto-Ordnance. NOTE: Officers (3\") uses shorter 6rd mags; verify length before buying.",
+  note:"Classic John Browning design (1911). Single-stack .45 ACP — factory max 8rd (modern) or 7rd (GI). Wilson Combat 8rd mags are considered the gold standard for reliability. Double-stack 2011 variants (Staccato, Prodigy) are listed separately as rank #17/18.",
+  linkMag:""
+}
+
+];
+
+// ── Link helpers ──────────────────────────────────
+function gbUrl(model) {
+  return "https://www.gunbroker.com/All/search?Keywords=" + encodeURIComponent(model);
+}
+function gmwUrl(model, override) {
+  const q = override || (model + " magazine");
+  return "https://www.gunmagwarehouse.com/search/?q=" + encodeURIComponent(q);
+}
+
+// ── State ─────────────────────────────────────────
+let sCol = "rank", sDir = 1;
+const F = { pb:"all", cal:"all", src:"all" };
+
+// ── Countdown ─────────────────────────────────────
+(()=>{
+  const d = Math.ceil((new Date("2026-07-01") - new Date()) / 86400000);
+  document.getElementById("days-left").textContent = d > 0 ? d : "PASSED";
+})();
+
+// ── Populate Purpose dropdown ─────────────────────
+const purs = [...new Set(DATA.map(p => p.purpose.split(" / ")[0]))].sort();
+const psel = document.getElementById("pur-filter");
+purs.forEach(p => { const o = document.createElement("option"); o.value = p; o.textContent = p; psel.appendChild(o); });
+
+// ── Stats ─────────────────────────────────────────
+function stats(rows) {
+  const u = rows.filter(r=>r.preBan).length, s = rows.length - u;
+  document.getElementById("stats-bar").innerHTML =
+    `<div class="stat-card all"><div class="value">${rows.length}</div><div class="lbl">Pistols Shown</div></div>
+     <div class="stat-card urgent"><div class="value">${u}</div><div class="lbl">Pre-Ban Action Needed</div></div>
+     <div class="stat-card safe"><div class="value">${s}</div><div class="lbl">Covered / Under Limit</div></div>`;
+}
+
+// ── Sort ──────────────────────────────────────────
+function sb(col) {
+  sDir = sCol === col ? sDir * -1 : 1; sCol = col;
+  document.querySelectorAll("thead th").forEach(t=>t.classList.remove("sa","sd"));
+  const idx = ["rank","model","purpose","priceMin","magOptions","preBan"].indexOf(col);
+  if (idx >= 0) document.querySelectorAll("thead th")[idx].classList.add(sDir===1?"sa":"sd");
+  applyFilters();
+}
+
+// ── Toggle ────────────────────────────────────────
+function tog(key, val, btn) {
+  F[key] = val;
+  btn.closest(".filter-toggle").querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  applyFilters();
+}
+
+// ── Clear ─────────────────────────────────────────
+function clearAll() {
+  document.getElementById("search").value = "";
+  document.getElementById("pur-filter").value = "";
+  document.getElementById("price-filter").value = "";
+  ["pb","cal","src"].forEach(k => {
+    const id = k+"-toggle";
+    document.querySelector(`#${id} button[data-v="all"]`).click();
+  });
+}
+
+// ── Render ────────────────────────────────────────
+function applyFilters() {
+  const q   = document.getElementById("search").value.toLowerCase();
+  const pur = document.getElementById("pur-filter").value;
+  const mp  = parseInt(document.getElementById("price-filter").value) || Infinity;
+
+  let rows = DATA.filter(p => {
+    if (F.pb  === "yes" && !p.preBan) return false;
+    if (F.pb  === "no"  &&  p.preBan) return false;
+    if (F.src !== "all" && p.src !== F.src) return false;
+    if (F.cal === "9mm"  && p.cal !== "9mm")  return false;
+    if (F.cal === ".22"  && p.cal !== ".22")   return false;
+    if (F.cal === "10mm" && p.cal !== "10mm")  return false;
+    if (F.cal === ".380" && p.cal !== ".380")  return false;
+    if (F.cal === ".45"  && p.cal !== ".45")   return false;
+    if (pur && !p.purpose.includes(pur)) return false;
+    if (p.priceMin > mp) return false;
+    if (q) {
+      const hay = [p.model,p.purpose,p.brands,p.compat,p.rec,p.mags.join(" "),p.note||""].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  rows.sort((a,b)=>{
+    let av=a[sCol], bv=b[sCol];
+    if (sCol==="magOptions"||sCol==="mags") { av=a.mags[0]; bv=b.mags[0]; }
+    if (sCol==="preBan") { av=a.preBan?1:0; bv=b.preBan?1:0; }
+    if (typeof av==="string") return sDir*av.localeCompare(bv);
+    return sDir*(av-bv);
+  });
+
+  stats(rows);
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  if (!rows.length) {
+    document.getElementById("none").style.display = "";
+    document.getElementById("tbl").style.display  = "none";
+    document.getElementById("result-count").textContent = "No results";
+    return;
+  }
+  document.getElementById("none").style.display = "none";
+  document.getElementById("tbl").style.display  = "";
+
+  rows.forEach(p => {
+    const tr  = document.createElement("tr");
+    if (p.preBan) tr.classList.add("pb-yes");
+
+    const isRec   = p.src === "rec";
+    const rankCls = isRec ? "rank-badge rec" : "rank-badge";
+    const srcTag  = isRec ? `<span class="src-tag">★ Pick</span>` : "";
+    const calBadge= `<span class="cal-badge">${p.cal}</span>`;
+    const pills   = p.mags.map(m=>`<span class="mag-pill">${m}</span>`).join("");
+    const badge   = p.preBan
+      ? `<span class="badge-yes">⚡ Buy Now</span>`
+      : `<span class="badge-no">✓ Not Needed</span>`;
+    const noteHtml  = p.note ? `<div class="note-text">${p.note}</div>` : "";
+    const magUrl    = p.linkMag || gmwUrl(p.model);
+    const gunUrl    = gbUrl(p.model);
+    const linkHtml  = `<br><a class="link-btn gun" href="${gunUrl}" target="_blank" rel="noopener">Buy Pistol ↗</a> <a class="link-btn" href="${magUrl}" target="_blank" rel="noopener">Buy Mags ↗</a>`;
+    const primaryPur= p.purpose.split(" / ")[0];
+
+    tr.innerHTML = `
+      <td><span class="${rankCls}">#${p.rd}</span></td>
+      <td><span class="model-name">${p.model}</span>${calBadge}${srcTag}</td>
+      <td><span class="purpose-tag">${primaryPur}</span></td>
+      <td class="price">$${p.priceMin.toLocaleString()}–$${p.priceMax.toLocaleString()}</td>
+      <td><div class="mag-pills">${pills}</div></td>
+      <td>${badge}</td>
+      <td><span class="rec-text">${p.rec}</span><div class="mag-price">💰 ${p.magPrice}</div>${linkHtml}</td>
+      <td class="brands">${p.brands}</td>
+      <td><div class="compat">${p.compat}${noteHtml}</div></td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("result-count").textContent =
+    `Showing ${rows.length} of ${DATA.length} pistols`;
+}
+
+sb("rank");
+</script>
+</body>
+</html>
